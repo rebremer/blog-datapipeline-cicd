@@ -1,0 +1,40 @@
+{
+	"name": "csv_files_key",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage2KEY",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"stor_url": "@pipeline().globalParameters.stor_url",
+				"akv_url": "@pipeline().globalParameters.akv_url"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "rawdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "name",
+				"type": "String"
+			},
+			{
+				"name": "age",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

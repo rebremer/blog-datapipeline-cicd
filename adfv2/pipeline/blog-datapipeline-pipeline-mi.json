@@ -1,0 +1,111 @@
+{
+	"name": "blog-datapipeline-pipeline-mi",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy csv to parquet",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "rawdata//"
+					},
+					{
+						"name": "Destination",
+						"value": "defineddata//"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFileName": "*"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"skipLineCount": 0
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": false
+				},
+				"inputs": [
+					{
+						"referenceName": "csv_files_mi",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "parquet_files_mi",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Create graph and write CosmosDB",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Copy csv to parquet",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "@pipeline().globalParameters.notebook_name",
+					"baseParameters": {
+						"cosmosdb_name": {
+							"value": "@pipeline().globalParameters.cosmosdb_name",
+							"type": "Expression"
+						},
+						"stor_name": {
+							"value": "@pipeline().globalParameters.stor_name",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"workspace_id_url": "@pipeline().globalParameters.workspace_id_url",
+						"cluster_id": "@pipeline().globalParameters.cluster_id",
+						"vaultBaseUrl": "@pipeline().globalParameters.vaultBaseUrl"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-10-16T18:50:24Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

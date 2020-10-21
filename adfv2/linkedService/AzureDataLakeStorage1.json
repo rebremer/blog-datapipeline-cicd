@@ -1,0 +1,16 @@
+{
+	"name": "AzureDataLakeStorage1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "AzureBlobFS",
+		"annotations": [],
+		"typeProperties": {
+			"url": "@{linkedService().stor_url}"
+		},
+		"parameters": {
+			"stor_url": {
+				"type": "String"
+			}
+		}
+	}
+}

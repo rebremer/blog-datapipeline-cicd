@@ -1,0 +1,40 @@
+{
+	"name": "blog-datapipeline-adfv2dev",
+	"properties": {
+		"globalParameters": {
+			"stor_url": {
+				"type": "string",
+				"value": "1"
+			},
+			"stor_name": {
+				"type": "string",
+				"value": "2"
+			},
+			"akv_url": {
+				"type": "string",
+				"value": "3"
+			},
+			"cluster_id": {
+				"type": "string",
+				"value": "4"
+			},
+			"notebook_name": {
+				"type": "string",
+				"value": "5"
+			},
+			"workspace_id_url": {
+				"type": "string",
+				"value": "6"
+			},
+			"cosmosdb_name": {
+				"type": "string",
+				"value": "7"
+			},
+			"vaultBaseUrl": {
+				"type": "string",
+				"value": "8"
+			}
+		}
+	},
+	"location": "westeurope"
+}

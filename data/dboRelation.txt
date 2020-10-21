@@ -1,0 +1,9 @@
+fromid,toid,relationtype
+"a","b","friend"
+"b","c","friend"
+"c","b","follow"
+"f","c","follow"
+"e","f","follow"
+"e","d","follow"
+"d","a","friend"
+"a","e","friend"

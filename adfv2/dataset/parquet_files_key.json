@@ -1,0 +1,24 @@
+{
+	"name": "parquet_files_key",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage2KEY",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"stor_url": "@pipeline().globalParameters.stor_url",
+				"akv_url": "@pipeline().globalParameters.akv_url"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "defineddata"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

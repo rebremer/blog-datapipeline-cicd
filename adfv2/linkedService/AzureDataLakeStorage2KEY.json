@@ -1,0 +1,33 @@
+{
+	"name": "AzureDataLakeStorage2KEY",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "AzureBlobFS",
+		"annotations": [],
+		"typeProperties": {
+			"url": "@{linkedService().stor_url}",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"akv_url": {
+							"value": "@linkedService().akv_url",
+							"type": "Expression"
+						}
+					}
+				},
+				"secretName": "stor-key"
+			}
+		},
+		"parameters": {
+			"stor_url": {
+				"type": "String"
+			},
+			"akv_url": {
+				"type": "String"
+			}
+		}
+	}
+}

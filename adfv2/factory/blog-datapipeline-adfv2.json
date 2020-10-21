@@ -1,0 +1,40 @@
+{
+	"name": "blog-datapipeline-adfv2",
+	"properties": {
+		"globalParameters": {
+			"stor_url": {
+				"type": "string",
+				"value": "$(stor_url)"
+			},
+			"akv_url": {
+				"type": "string",
+				"value": "$(akv_url)"
+			},
+			"cluster_id": {
+				"type": "string",
+				"value": "$(cluster_id)"
+			},
+			"stor_name": {
+				"type": "string",
+				"value": "blogdatapipelinestor203"
+			},
+			"notebook_name": {
+				"type": "string",
+				"value": "insert_data_CosmosDB_Gremlin.py"
+			},
+			"vaultBaseUrl": {
+				"type": "string",
+				"value": "$(akv_url)"
+			},
+			"cosmosdb_name": {
+				"type": "string",
+				"value": "blog-datapipeline-cosmos203"
+			},
+			"workspace_id_url": {
+				"type": "string",
+				"value": "$(workspace_id_url)"
+			}
+		}
+	},
+	"location": "westeurope"
+}

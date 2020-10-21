@@ -1,0 +1,108 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+variables:
+  # change variables with your own
+  AzureServiceConnectionId: 'blog-datapipelineprod-servcon'
+  ACCESS_STOR_AADDBR: 0
+  SECRETSCOPE_KEYVAULT: 0
+  MOUNT_STORAGE_DATABRICKS: 0 # can only be used if access_store_AAD is true
+  ENABLE_FIREWALL: 1
+  RG: 'blog-datapipelineprod-rg'
+  SUB: '513a7987-b0d9-4106-a24d-4b3f49136ea8'
+  LOC: 'westeurope'
+  AKV: 'blogdatapipelineakv306' # unique value
+  STOR: 'blogdatapipelinestor306' #unique value
+  COSMOSDBNAME: 'blog-datapipeline-cosmos306' #unique value
+  # no need to change
+  SPN: 'blog-datapipeline-spn'
+  ADFV2: 'blog-datapipeline-adfv2'
+  DBRWORKSPACE: 'blog-datapipeline-dbr306'
+  VNET: 'blog-datapipeline-vnet'
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+  - repository: blog-datapipeline-cicd
+    type: github
+    endpoint: rebremer
+    name: rebremer/blog-datapipeline-cicd
+    ref: main
+  - repository: blog-datapipeline-deployadfv2
+    type: github
+    endpoint: rebremer
+    name: rebremer/blog-datapipeline-cicd
+    ref: adf_publish
+
+steps:
+- checkout: blog-datapipeline-cicd
+  path: blog-datapipeline-cicd
+
+- task: AzurePowerShell@4
+  displayName: 'Create ADFv2 instance with MI'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    ScriptType: InlineScript
+    Inline: "Set-AzDataFactoryV2 -ResourceGroupName $(RG) -Location $(LOC) -Name $(ADFV2)"
+    azurePowerShellVersion: LatestVersion
+- task: AzureCLI@1
+  displayName: 'Create resources'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    scriptType: bash
+    scriptPath: '../blog-datapipeline-cicd/1_create_resources.sh'
+- task: AzureCLI@1
+  displayName: 'Configure Databricks'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    scriptType: bash
+    scriptPath: '../blog-datapipeline-cicd/2_configure_databricks.sh'
+- task: AzureCLI@1
+  displayName: 'Configure access to storage account'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    scriptType: bash
+    scriptPath: '../blog-datapipeline-cicd/3_configure_access_storage_databricks.sh'
+- task: AzureCLI@1
+  displayName: 'Configure Secret Scope Databricks'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    scriptType: bash
+    scriptPath: '../blog-datapipeline-cicd/4_configure_secret_scope_databricks.sh'
+- task: AzureCLI@1
+  displayName: 'Configure Mounting to Databricks'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    scriptType: bash
+    scriptPath: '../blog-datapipeline-cicd/5_configure_mount_storage_databricks.sh'
+- task: AzureCLI@1
+  displayName: 'Configure Firewall'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    scriptType: bash
+    scriptPath: '../blog-datapipeline-cicd/6_configure_firewall.sh'
+- checkout: blog-datapipeline-deployadfv2
+  path: blog-datapipeline-deployadfv2
+- task: AzureResourceManagerTemplateDeployment@3
+  displayName: 'Deploy ARM template ADFv2'
+  inputs:
+    azureResourceManagerConnection: $(AzureServiceConnectionId)
+    subscriptionId: $(SUB)
+    resourceGroupName: $(RG)
+    location: $(LOC)
+    csmFile: '../blog-datapipeline-deployadfv2/blog-datapipeline-adfv2/ARMTemplateForFactory.json'
+    csmParametersFile: '../blog-datapipeline-deployadfv2/blog-datapipeline-adfv2/ARMTemplateParametersForFactory.json'
+    overrideParameters: "-factoryName $(ADFV2) -dataFactory_properties_globalParameters_akv_url_value $(akv_url) -dataFactory_properties_globalParameters_stor_url_value $(stor_url) -dataFactory_properties_globalParameters_stor_name_value $(STOR) -dataFactory_properties_globalParameters_cosmosdb_name_value $(COSMOSDBNAME) -dataFactory_properties_globalParameters_workspace_id_url_value $(workspace_id_url) -dataFactory_properties_globalParameters_cluster_id_value $(cluster_id) -dataFactory_properties_globalParameters_vaultBaseUrl_value $(akv_url) -dataFactory_location $(LOC) -dataFactory_properties_globalParameters_notebook_name_value /insert_data_CosmosDB_Gremlin.py"
+- task: AzurePowerShell@4
+  displayName: 'Run ADFv2 pipeline - standard'
+  inputs:
+    azureSubscription: $(AzureServiceConnectionId)
+    ScriptType: InlineScript
+    Inline: "Invoke-AzDataFactoryV2Pipeline -ResourceGroupName $(RG) -DataFactoryName $(ADFV2) -PipelineName \"blog-datapipeline-pipeline-mi\""
+    azurePowerShellVersion: LatestVersion
