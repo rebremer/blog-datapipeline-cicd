@@ -1,21 +1,8 @@
-first commit
+### Azure Data Factory (ADFv2) copy & metadata pipeline using common data model (CDM) syntax ###
 
-Key vault
--Acces
---ADFv2: MI
--Firewall:
---ADFv2: Allow trusted MS service
+![Architecture](https://github.com/rebremer/blog-datapipeline-cicd/blob/master/pictures/2_architecture.png)
 
-Storage account:
--Access
---ADFv2: MI
---Databricks: SPN or key
--Firewall
---ADFv2: Allow trusted MS service
---Databricks: VNET
-
-Cosmos DB account:
--Access
---Databricks: Key
--Firewall
---Databricks: VNET
+In this blogpost, a data pipeline project is created that does the following:
+1. Setup Azure DevOps CI/CD project 
+2. Deploy and configure Azure resources using Azure DevOps
+3. Run Data Factory pipeline adding data to Cosmos DB Graph API using a Databricks notebook
