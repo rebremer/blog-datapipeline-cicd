@@ -4,7 +4,7 @@
 		"activities": [
 			{
 				"name": "Copy csv to parquet",
-				"description": "",
+				"description": "Copy csv to parquet",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
