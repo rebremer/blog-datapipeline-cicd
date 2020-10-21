@@ -8,8 +8,8 @@ az keyvault secret set -n tenant-id --vault-name $AKV --value $tenantId
 az storage account create -n $STOR -g $RG -l $LOC --sku Standard_LRS --kind StorageV2 --enable-hierarchical-namespace true
 az storage container create --account-name $STOR -n "rawdata"
 az storage container create --account-name $STOR -n "defineddata"
-az storage blob upload -f "data/dboPerson.txt" -c "rawdata" -n "dboPerson.txt" --account-name $STOR 
-az storage blob upload -f "data/dboRelation.txt" -c "rawdata" -n "dboRelation.txt" --account-name $STOR
+az storage blob upload -f "../data/dboPerson.txt" -c "rawdata" -n "dboPerson.txt" --account-name $STOR 
+az storage blob upload -f "../data/dboRelation.txt" -c "rawdata" -n "dboRelation.txt" --account-name $STOR
 # Databricks
 az extension add --name databricks
 vnetaddressrange="10.210.0.0"
