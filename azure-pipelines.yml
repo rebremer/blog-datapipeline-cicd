@@ -56,37 +56,37 @@ steps:
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/1_create_resources.sh'
+    scriptPath: '../blog-datapipeline-cicd/scripts/1_create_resources.sh'
 - task: AzureCLI@1
   displayName: 'Configure Databricks'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/2_configure_databricks.sh'
+    scriptPath: '../blog-datapipeline-cicd/scripts/2_configure_databricks.sh'
 - task: AzureCLI@1
   displayName: 'Configure access to storage account'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/3_configure_access_storage_databricks.sh'
+    scriptPath: '../blog-datapipeline-cicd/scripts/3_configure_access_storage_databricks.sh'
 - task: AzureCLI@1
   displayName: 'Configure Secret Scope Databricks'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/4_configure_secret_scope_databricks.sh'
+    scriptPath: '../blog-datapipeline-cicd/scripts/4_configure_secret_scope_databricks.sh'
 - task: AzureCLI@1
   displayName: 'Configure Mounting to Databricks'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/5_configure_mount_storage_databricks.sh'
+    scriptPath: '../blog-datapipeline-cicd/scripts/5_configure_mount_storage_databricks.sh'
 - task: AzureCLI@1
   displayName: 'Configure Firewall'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/6_configure_firewall.sh'
+    scriptPath: '../blog-datapipeline-cicd/scripts/6_configure_firewall.sh'
 - checkout: blog-datapipeline-deployadfv2
   path: blog-datapipeline-deployadfv2
 - task: AzureResourceManagerTemplateDeployment@3
