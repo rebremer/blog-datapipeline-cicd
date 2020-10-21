@@ -1,0 +1,621 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "blog-datapipeline-adfv2"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().stor_url}"
+		},
+		"AzureDataLakeStorage2KEY_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().stor_url}"
+		},
+		"AzureKeyVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "@{linkedService().akv_url}"
+		},
+		"dataFactory_properties_globalParameters_stor_url_value": {
+			"type": "string",
+			"defaultValue": "https://blogdatapipelinestor306.dfs.core.windows.net/"
+		},
+		"dataFactory_properties_globalParameters_akv_url_value": {
+			"type": "string",
+			"defaultValue": "https://blogdatapipelineakv306.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_cluster_id_value": {
+			"type": "string",
+			"defaultValue": "1020-103424-crook396"
+		},
+		"dataFactory_properties_globalParameters_stor_name_value": {
+			"type": "string",
+			"defaultValue": "blogdatapipelinestor306"
+		},
+		"dataFactory_properties_globalParameters_notebook_name_value": {
+			"type": "string",
+			"defaultValue": "/insert_data_CosmosDB_Gremlin.py"
+		},
+		"dataFactory_properties_globalParameters_vaultBaseUrl_value": {
+			"type": "string",
+			"defaultValue": "https://blogdatapipelineakv306.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_cosmosdb_name_value": {
+			"type": "string",
+			"defaultValue": "blog-datapipeline-cosmos306"
+		},
+		"dataFactory_properties_globalParameters_workspace_id_url_value": {
+			"type": "string",
+			"defaultValue": "https://westeurope.azuredatabricks.net/"
+		},
+		"dataFactory_location": {
+			"type": "string",
+			"defaultValue": "westeurope"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/blog-datapipeline-pipeline-key')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy csv to parquet",
+						"description": "Copy csv to parquet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "rawdata//"
+							},
+							{
+								"name": "Destination",
+								"value": "defineddata//"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"skipLineCount": 0
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "csv_files_key",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "parquet_files_key",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Create graph and write CosmosDB",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy csv to parquet",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().globalParameters.notebook_name",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"cosmosdb_name": {
+									"value": "@pipeline().globalParameters.cosmosdb_name",
+									"type": "Expression"
+								},
+								"stor_name": {
+									"value": "@pipeline().globalParameters.stor_name",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"workspace_id_url": "@pipeline().globalParameters.workspace_id_url",
+								"cluster_id": "@pipeline().globalParameters.cluster_id",
+								"vaultBaseUrl": "@pipeline().globalParameters.vaultBaseUrl"
+							}
+						}
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2020-10-20T10:52:17Z"
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/datasets/csv_files_key')]",
+				"[concat(variables('factoryId'), '/datasets/parquet_files_key')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/blog-datapipeline-pipeline-mi')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy csv to parquet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "rawdata//"
+							},
+							{
+								"name": "Destination",
+								"value": "defineddata//"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"skipLineCount": 0
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "csv_files_mi",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "parquet_files_mi",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Create graph and write CosmosDB",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy csv to parquet",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().globalParameters.notebook_name",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"cosmosdb_name": {
+									"value": "@pipeline().globalParameters.cosmosdb_name",
+									"type": "Expression"
+								},
+								"stor_name": {
+									"value": "@pipeline().globalParameters.stor_name",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"workspace_id_url": "@pipeline().globalParameters.workspace_id_url",
+								"cluster_id": "@pipeline().globalParameters.cluster_id",
+								"vaultBaseUrl": "@pipeline().globalParameters.vaultBaseUrl"
+							}
+						}
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2020-10-20T10:52:16Z"
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/datasets/csv_files_mi')]",
+				"[concat(variables('factoryId'), '/datasets/parquet_files_mi')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/csv_files_key')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage2KEY",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"stor_url": "@pipeline().globalParameters.stor_url",
+						"akv_url": "@pipeline().globalParameters.akv_url"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "rawdata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "age",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage2KEY')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/csv_files_mi')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"stor_url": "@pipeline().globalParameters.stor_url"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "rawdata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "age",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/parquet_files_key')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage2KEY",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"stor_url": "@pipeline().globalParameters.stor_url",
+						"akv_url": "@pipeline().globalParameters.akv_url"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "defineddata"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage2KEY')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/parquet_files_mi')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"stor_url": "@pipeline().globalParameters.stor_url"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "defineddata"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "AzureBlobFS",
+				"annotations": [],
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				},
+				"parameters": {
+					"stor_url": {
+						"type": "String"
+					}
+				}
+			},
+			"dependsOn": [
+				"[variables('factoryId')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage2KEY')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "AzureBlobFS",
+				"annotations": [],
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage2KEY_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"akv_url": {
+									"value": "@linkedService().akv_url",
+									"type": "Expression"
+								}
+							}
+						},
+						"secretName": "stor-key"
+					}
+				},
+				"parameters": {
+					"stor_url": {
+						"type": "String"
+					},
+					"akv_url": {
+						"type": "String"
+					}
+				}
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"workspace_id_url": {
+						"type": "String"
+					},
+					"cluster_id": {
+						"type": "String"
+					},
+					"vaultBaseUrl": {
+						"type": "string",
+						"defaultValue": "https://blogdatapipelineprodakv2.vault.azure.net/"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "@{linkedService().workspace_id_url}",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"akv_url": {
+									"value": "@linkedService().vaultBaseUrl",
+									"type": "Expression"
+								}
+							}
+						},
+						"secretName": "pattoken"
+					},
+					"existingClusterId": "@{linkedService().cluster_id}"
+				}
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "AzureKeyVault",
+				"annotations": [],
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault_properties_typeProperties_baseUrl')]"
+				},
+				"parameters": {
+					"akv_url": {
+						"type": "String"
+					}
+				}
+			},
+			"dependsOn": [
+				"[variables('factoryId')]"
+			]
+		},
+		{
+			"name": "[parameters('factoryName')]",
+			"type": "Microsoft.DataFactory/factories",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"globalParameters": {
+					"stor_url": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_stor_url_value')]"
+					},
+					"akv_url": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_akv_url_value')]"
+					},
+					"cluster_id": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_cluster_id_value')]"
+					},
+					"stor_name": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_stor_name_value')]"
+					},
+					"notebook_name": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_notebook_name_value')]"
+					},
+					"vaultBaseUrl": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_vaultBaseUrl_value')]"
+					},
+					"cosmosdb_name": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_cosmosdb_name_value')]"
+					},
+					"workspace_id_url": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_workspace_id_url_value')]"
+					}
+				}
+			},
+			"dependsOn": [],
+			"location": "[parameters('dataFactory_location')]"
+		}
+	]
+}

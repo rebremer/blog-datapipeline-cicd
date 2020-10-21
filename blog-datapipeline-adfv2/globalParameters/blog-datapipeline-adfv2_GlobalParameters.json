@@ -1,0 +1,34 @@
+{
+	"stor_url": {
+		"type": "string",
+		"value": "https://blogdatapipelinestor306.dfs.core.windows.net/"
+	},
+	"akv_url": {
+		"type": "string",
+		"value": "https://blogdatapipelineakv306.vault.azure.net/"
+	},
+	"cluster_id": {
+		"type": "string",
+		"value": "1020-103424-crook396"
+	},
+	"stor_name": {
+		"type": "string",
+		"value": "blogdatapipelinestor306"
+	},
+	"notebook_name": {
+		"type": "string",
+		"value": "/insert_data_CosmosDB_Gremlin.py"
+	},
+	"vaultBaseUrl": {
+		"type": "string",
+		"value": "https://blogdatapipelineakv306.vault.azure.net/"
+	},
+	"cosmosdb_name": {
+		"type": "string",
+		"value": "blog-datapipeline-cosmos306"
+	},
+	"workspace_id_url": {
+		"type": "string",
+		"value": "https://westeurope.azuredatabricks.net/"
+	}
+}

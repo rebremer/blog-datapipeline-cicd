@@ -1,0 +1,126 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "blog-datapipeline-adfv2"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().stor_url}"
+		},
+		"AzureDataLakeStorage2KEY_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().stor_url}"
+		},
+		"AzureKeyVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "@{linkedService().akv_url}"
+		},
+		"dataFactory_properties_globalParameters_stor_url_value": {
+			"type": "string",
+			"defaultValue": "https://blogdatapipelinestor306.dfs.core.windows.net/"
+		},
+		"dataFactory_properties_globalParameters_akv_url_value": {
+			"type": "string",
+			"defaultValue": "https://blogdatapipelineakv306.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_cluster_id_value": {
+			"type": "string",
+			"defaultValue": "1020-103424-crook396"
+		},
+		"dataFactory_properties_globalParameters_stor_name_value": {
+			"type": "string",
+			"defaultValue": "blogdatapipelinestor306"
+		},
+		"dataFactory_properties_globalParameters_notebook_name_value": {
+			"type": "string",
+			"defaultValue": "/insert_data_CosmosDB_Gremlin.py"
+		},
+		"dataFactory_properties_globalParameters_vaultBaseUrl_value": {
+			"type": "string",
+			"defaultValue": "https://blogdatapipelineakv306.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_cosmosdb_name_value": {
+			"type": "string",
+			"defaultValue": "blog-datapipeline-cosmos306"
+		},
+		"dataFactory_properties_globalParameters_workspace_id_url_value": {
+			"type": "string",
+			"defaultValue": "https://westeurope.azuredatabricks.net/"
+		},
+		"dataFactory_location": {
+			"type": "string",
+			"defaultValue": "westeurope"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "blog-datapipeline-adfv2_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"dataFactory_properties_globalParameters_stor_url_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_stor_url_value')]"
+					},
+					"dataFactory_properties_globalParameters_akv_url_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_akv_url_value')]"
+					},
+					"dataFactory_properties_globalParameters_cluster_id_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_cluster_id_value')]"
+					},
+					"dataFactory_properties_globalParameters_stor_name_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_stor_name_value')]"
+					},
+					"dataFactory_properties_globalParameters_notebook_name_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_notebook_name_value')]"
+					},
+					"dataFactory_properties_globalParameters_vaultBaseUrl_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_vaultBaseUrl_value')]"
+					},
+					"dataFactory_properties_globalParameters_cosmosdb_name_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_cosmosdb_name_value')]"
+					},
+					"dataFactory_properties_globalParameters_workspace_id_url_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_workspace_id_url_value')]"
+					},
+					"dataFactory_location": {
+						"value": "[parameters('dataFactory_location')]"
+					},
+					"AzureDataLakeStorage1_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+					},
+					"AzureKeyVault_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVault_properties_typeProperties_baseUrl')]"
+					},
+					"AzureDataLakeStorage2KEY_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage2KEY_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

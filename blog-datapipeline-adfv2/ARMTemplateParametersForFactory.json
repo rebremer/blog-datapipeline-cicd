@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "blog-datapipeline-adfv2"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "@{linkedService().stor_url}"
+		},
+		"AzureDataLakeStorage2KEY_properties_typeProperties_url": {
+			"value": "@{linkedService().stor_url}"
+		},
+		"AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "@{linkedService().akv_url}"
+		},
+		"dataFactory_properties_globalParameters_stor_url_value": {
+			"value": "https://blogdatapipelinestor306.dfs.core.windows.net/"
+		},
+		"dataFactory_properties_globalParameters_akv_url_value": {
+			"value": "https://blogdatapipelineakv306.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_cluster_id_value": {
+			"value": "1020-103424-crook396"
+		},
+		"dataFactory_properties_globalParameters_stor_name_value": {
+			"value": "blogdatapipelinestor306"
+		},
+		"dataFactory_properties_globalParameters_notebook_name_value": {
+			"value": "/insert_data_CosmosDB_Gremlin.py"
+		},
+		"dataFactory_properties_globalParameters_vaultBaseUrl_value": {
+			"value": "https://blogdatapipelineakv306.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_cosmosdb_name_value": {
+			"value": "blog-datapipeline-cosmos306"
+		},
+		"dataFactory_properties_globalParameters_workspace_id_url_value": {
+			"value": "https://westeurope.azuredatabricks.net/"
+		},
+		"dataFactory_location": {
+			"value": "westeurope"
+		}
+	}
+}
