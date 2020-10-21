@@ -3,14 +3,16 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 variables:
-  # change variables with your own
+  # Azure DevOps settings
+  AzureServiceConnectionId: 'blog-datapipelineprod-servcon'
+  GitRepoName: 'blog-datapipeline-devops'
+  # Change environment variables used in bash scripts with your own
+  RG: 'blog-datapipelineprod-rg'
   SUB: '<<your subscription>>'
   AKV: 'blogdatapipelineakv123' # unique value
-  STOR: 'blogdatapipelinestor123' #unique value
+  STOR: 'blogdatapipelinestor123' # unique value
   COSMOSDBNAME: 'blog-datapipeline-cosmos123' #unique value
-  # no need to change
-  AzureServiceConnectionId: 'blog-datapipelineprod-servcon'
-  RG: 'blog-datapipelineprod-rg'
+  # fixed Environment variables, no need for unique values
   LOC: 'westeurope'
   SPN: 'blog-datapipeline-spn'
   ADFV2: 'blog-datapipeline-adfv2'
@@ -31,14 +33,12 @@ pool:
 resources:
   repositories:
   - repository: blog-datapipeline-cicd
-    type: github
-    endpoint: rebremer
-    name: rebremer/blog-datapipeline-cicd
-    ref: main
+    type: git
+    name: $(GitRepoName)
+    ref: master
   - repository: blog-datapipeline-deployadfv2
-    type: github
-    endpoint: rebremer
-    name: rebremer/blog-datapipeline-cicd
+    type: git
+    name: $(GitRepoName)
     ref: adf_publish
 
 steps:
