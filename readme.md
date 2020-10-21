@@ -1,4 +1,4 @@
-### Azure Data Factory (ADFv2) copy & metadata pipeline using common data model (CDM) syntax ###
+### Data pipeline project using Data Factory, Databricks and Cosmosdb Graph, deployed using Azure DevOps, secured using firewalls and Azure AD
 
 ![Architecture](https://github.com/rebremer/blog-datapipeline-cicd/blob/master/pictures/2_architecture.png)
 
