@@ -81,7 +81,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "@pipeline().globalParameters.notebook_name",
+					"notebookPath": {
+						"value": "@pipeline().globalParameters.notebook_name",
+						"type": "Expression"
+					},
 					"baseParameters": {
 						"cosmosdb_name": {
 							"value": "@pipeline().globalParameters.cosmosdb_name",
@@ -105,7 +108,7 @@
 			}
 		],
 		"annotations": [],
-		"lastPublishTime": "2020-10-16T18:50:24Z"
+		"lastPublishTime": "2020-10-20T10:52:16Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }
