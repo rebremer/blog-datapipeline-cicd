@@ -1,11 +1,6 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
 variables:
   # Azure DevOps settings
   AzureServiceConnectionId: 'blog-datapipelineprod-servcon'
-  GitRepoName: 'blog-datapipeline-devops'
   # Change environment variables used in bash scripts with your own
   RG: 'blog-datapipelineprod-rg'
   SUB: '<<your subscription>>'
@@ -32,25 +27,24 @@ pool:
 
 resources:
   repositories:
-  - repository: blog-datapipeline-cicd
+  - repository: blog-datapipeline-cicd # change with your own repo name when necessary
     type: git
-    name: $(GitRepoName)
+    name: blog-datapipeline-devops
     ref: master
-  - repository: blog-datapipeline-deployadfv2
+  - repository: blog-datapipeline-deployadfv2 # change with your own repo name when necessary
     type: git
-    name: $(GitRepoName)
+    name: blog-datapipeline-devops
     ref: adf_publish
 
 steps:
 - checkout: blog-datapipeline-cicd
   path: blog-datapipeline-cicd
-
 - task: AzurePowerShell@4
   displayName: 'Create ADFv2 instance with MI'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     ScriptType: InlineScript
-    Inline: "Set-AzDataFactoryV2 -ResourceGroupName $(RG) -Location $(LOC) -Name $(ADFV2)"
+    Inline: "Set-AzDataFactoryV2 -ResourceGroupName $(RG) -Location $(LOC) -Name $(ADFV2) -Force"
     azurePowerShellVersion: LatestVersion
 - task: AzureCLI@1
   displayName: 'Create resources'
