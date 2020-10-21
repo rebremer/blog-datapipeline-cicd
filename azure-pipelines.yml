@@ -4,22 +4,23 @@
 # https://aka.ms/yaml
 variables:
   # change variables with your own
+  SUB: '<<your subscription>>'
+  AKV: 'blogdatapipelineakv123' # unique value
+  STOR: 'blogdatapipelinestor123' #unique value
+  COSMOSDBNAME: 'blog-datapipeline-cosmos123' #unique value
+  # no need to change
   AzureServiceConnectionId: 'blog-datapipelineprod-servcon'
+  RG: 'blog-datapipelineprod-rg'
+  LOC: 'westeurope'
+  SPN: 'blog-datapipeline-spn'
+  ADFV2: 'blog-datapipeline-adfv2'
+  DBRWORKSPACE: 'blog-datapipeline-dbr'
+  VNET: 'blog-datapipeline-vnet'
+  # global settings
   ACCESS_STOR_AADDBR: 0
   SECRETSCOPE_KEYVAULT: 0
   MOUNT_STORAGE_DATABRICKS: 0 # can only be used if access_store_AAD is true
   ENABLE_FIREWALL: 1
-  RG: 'blog-datapipelineprod-rg'
-  SUB: '513a7987-b0d9-4106-a24d-4b3f49136ea8'
-  LOC: 'westeurope'
-  AKV: 'blogdatapipelineakv306' # unique value
-  STOR: 'blogdatapipelinestor306' #unique value
-  COSMOSDBNAME: 'blog-datapipeline-cosmos306' #unique value
-  # no need to change
-  SPN: 'blog-datapipeline-spn'
-  ADFV2: 'blog-datapipeline-adfv2'
-  DBRWORKSPACE: 'blog-datapipeline-dbr306'
-  VNET: 'blog-datapipeline-vnet'
 
 trigger:
 - master
