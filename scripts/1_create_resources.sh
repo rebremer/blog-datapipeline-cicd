@@ -12,17 +12,20 @@ az storage blob upload -f "../data/dboPerson.txt" -c "rawdata" -n "dboPerson.txt
 az storage blob upload -f "../data/dboRelation.txt" -c "rawdata" -n "dboRelation.txt" --account-name $STOR
 # Databricks
 az extension add --name databricks
-vnetaddressrange="10.210.0.0"
-subnet1addressrange="10.210.0.0"
-subnet2addressrange="10.210.1.0"
-az network vnet create -g $RG -n $VNET --address-prefix $vnetaddressrange/16 -l $LOC  
-az network nsg create -g $RG -n "public-subnet-nsg"
-az network nsg create -g $RG -n "private-subnet-nsg"
-az network vnet subnet create -g $RG --vnet-name $VNET -n "public-subnet" --address-prefixes $subnet1addressrange/24 --network-security-group "public-subnet-nsg"
-az network vnet subnet create -g $RG --vnet-name $VNET -n "private-subnet" --address-prefixes $subnet2addressrange/24 --network-security-group "private-subnet-nsg"
-az network vnet subnet update --resource-group $RG --name "public-subnet" --vnet-name $VNET --delegations Microsoft.Databricks/workspaces
-az network vnet subnet update --resource-group $RG --name "private-subnet" --vnet-name $VNET --delegations Microsoft.Databricks/workspaces
-az databricks workspace create -l $LOC -n $DBRWORKSPACE -g $RG --sku premium --vnet $VNET --public-subnet "public-subnet" --private-subnet "private-subnet"
+dbr_id=$(az databricks workspace show -g $RG -n $DBRWORKSPACE)
+if ["$dbr_id" = ""]; then
+   vnetaddressrange="10.210.0.0"
+   subnet1addressrange="10.210.0.0"
+   subnet2addressrange="10.210.1.0"
+   az network vnet create -g $RG -n $VNET --address-prefix $vnetaddressrange/16 -l $LOC  
+   az network nsg create -g $RG -n "public-subnet-nsg"
+   az network nsg create -g $RG -n "private-subnet-nsg"
+   az network vnet subnet create -g $RG --vnet-name $VNET -n "public-subnet" --address-prefixes $subnet1addressrange/24 --network-security-group "public-subnet-nsg"
+   az network vnet subnet create -g $RG --vnet-name $VNET -n "private-subnet" --address-prefixes $subnet2addressrange/24 --network-security-group "private-subnet-nsg"
+   az network vnet subnet update --resource-group $RG --name "public-subnet" --vnet-name $VNET --delegations Microsoft.Databricks/workspaces
+   az network vnet subnet update --resource-group $RG --name "private-subnet" --vnet-name $VNET --delegations Microsoft.Databricks/workspaces
+   az databricks workspace create -l $LOC -n $DBRWORKSPACE -g $RG --sku premium --vnet $VNET --public-subnet "public-subnet" --private-subnet "private-subnet"
+fi
 # Variables
 akv_url="https://"$AKV".vault.azure.net/"
 stor_url="https://"$STOR".dfs.core.windows.net/"
