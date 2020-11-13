@@ -8,7 +8,6 @@
 # COMMAND ----------
 
 par_stor_name = dbutils.widgets.get("stor_name")
-par_tenant = dbutils.widgets.get("tenant_id")
 
 # COMMAND ----------
 

@@ -11,15 +11,21 @@ if ["$spn_id" = ""]; then
     exit 0
 fi
 #
-# 1. Run job to run notebook to mount storage
+# 1. Create job
+keyvault_response=$(az keyvault secret show -n pattoken --vault-name $AKV)
+pat_token=$(jq .value -r <<< "$keyvault_response")
+api_response=$(curl -v -X POST https://$LOC.azuredatabricks.net/api/2.0/jobs/create \
+  -H "Authorization: Bearer $pat_token" \
+  -d "{\"name\": \"mount storage\", \"existing_cluster_id\": \"$cluster_id\", \"notebook_task\": {\"notebook_path\": \"/mount_ADLSgen2_rawdata\", \"base_parameters\": [{\"key\":\"stor_name\", \"value\":\"$STOR\"}]}}")
+job_id=$(jq .job_id -r <<< "$api_response")
+#
+# 2. Run job to run notebook to mount storage
 api_response=$(curl -v -X POST https://$LOC.azuredatabricks.net/api/2.0/jobs/run-now \
-  -H "Authorization: Bearer $token" \
-  -H "X-Databricks-Azure-SP-Management-Token:$azToken" \
-  -H "X-Databricks-Azure-Workspace-Resource-Id:$wsId" \
+  -H "Authorization: Bearer $pat_token" \
   -d "{\"job_id\": $job_id}")
 run_id=$(jq .run_id -r <<< "$api_response")
 #
-# 2. Wait until jobs if finished (mainly dependent on step 9 to create cluster)
+# 3. Wait until jobs if finished (mainly dependent on step 9 to create cluster)
 i=0
 while [ $i -lt 10 ]
 do
