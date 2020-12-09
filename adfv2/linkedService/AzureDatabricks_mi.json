@@ -1,0 +1,15 @@
+{
+	"name": "AzureDatabricks_mi",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-4321390144498155.15.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/513a7987-b0d9-4106-a24d-4b3f49136ea8/resourceGroups/blog-datapipelineprod-rg/providers/Microsoft.Databricks/workspaces/blog-datapipeline-dbrrb4",
+			"newClusterNodeType": "Standard_NC24",
+			"newClusterNumOfWorker": "1",
+			"newClusterVersion": "5.5.x-gpu-scala2.11"
+		}
+	}
+}
