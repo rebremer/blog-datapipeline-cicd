@@ -97,12 +97,12 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "AzureDatabricks1",
+					"referenceName": "AzureDatabricks_mi",
 					"type": "LinkedServiceReference",
 					"parameters": {
 						"workspace_id_url": "@pipeline().globalParameters.workspace_id_url",
 						"cluster_id": "@pipeline().globalParameters.cluster_id",
-						"vaultBaseUrl": "@pipeline().globalParameters.vaultBaseUrl"
+						"dbr_resource_id": "@pipeline().globalParameters.dbr_resource_id"
 					}
 				}
 			}
