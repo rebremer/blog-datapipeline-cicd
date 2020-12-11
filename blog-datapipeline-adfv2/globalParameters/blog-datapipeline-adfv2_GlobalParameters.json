@@ -30,5 +30,9 @@
 	"workspace_id_url": {
 		"type": "string",
 		"value": "https://westeurope.azuredatabricks.net/"
+	},
+	"dbr_resource_id": {
+		"type": "string",
+		"value": "/subscriptions/513a7987-b0d9-4106-a24d-4b3f49136ea8/resourceGroups/blog-datapipelineprod-rg/providers/Microsoft.Databricks/workspaces/blog-datapipeline-dbrrb4"
 	}
 }

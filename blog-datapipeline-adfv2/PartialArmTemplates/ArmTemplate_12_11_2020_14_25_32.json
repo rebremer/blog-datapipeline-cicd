@@ -6,58 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "blog-datapipeline-adfv2"
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "@{linkedService().stor_url}"
-		},
-		"AzureDataLakeStorage2KEY_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "@{linkedService().stor_url}"
-		},
-		"AzureKeyVault_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "@{linkedService().akv_url}"
-		},
-		"dataFactory_properties_globalParameters_stor_url_value": {
-			"type": "string",
-			"defaultValue": "https://blogdatapipelinestor306.dfs.core.windows.net/"
-		},
-		"dataFactory_properties_globalParameters_akv_url_value": {
-			"type": "string",
-			"defaultValue": "https://blogdatapipelineakv306.vault.azure.net/"
-		},
-		"dataFactory_properties_globalParameters_cluster_id_value": {
-			"type": "string",
-			"defaultValue": "1020-103424-crook396"
-		},
-		"dataFactory_properties_globalParameters_stor_name_value": {
-			"type": "string",
-			"defaultValue": "blogdatapipelinestor306"
-		},
-		"dataFactory_properties_globalParameters_notebook_name_value": {
-			"type": "string",
-			"defaultValue": "/insert_data_CosmosDB_Gremlin.py"
-		},
-		"dataFactory_properties_globalParameters_vaultBaseUrl_value": {
-			"type": "string",
-			"defaultValue": "https://blogdatapipelineakv306.vault.azure.net/"
-		},
-		"dataFactory_properties_globalParameters_cosmosdb_name_value": {
-			"type": "string",
-			"defaultValue": "blog-datapipeline-cosmos306"
-		},
-		"dataFactory_properties_globalParameters_workspace_id_url_value": {
-			"type": "string",
-			"defaultValue": "https://westeurope.azuredatabricks.net/"
-		},
-		"dataFactory_properties_globalParameters_dbr_resource_id_value": {
-			"type": "string",
-			"defaultValue": "/subscriptions/513a7987-b0d9-4106-a24d-4b3f49136ea8/resourceGroups/blog-datapipelineprod-rg/providers/Microsoft.Databricks/workspaces/blog-datapipeline-dbrrb4"
-		},
-		"dataFactory_location": {
-			"type": "string",
-			"defaultValue": "westeurope"
 		}
 	},
 	"variables": {
@@ -119,15 +67,13 @@
 						"inputs": [
 							{
 								"referenceName": "csv_files_mi",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "parquet_files_mi",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					},
@@ -243,15 +189,13 @@
 						"inputs": [
 							{
 								"referenceName": "csv_files_key",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "parquet_files_key",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					},
@@ -366,15 +310,13 @@
 						"inputs": [
 							{
 								"referenceName": "csv_files_mi",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "parquet_files_mi",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					},
@@ -588,7 +530,7 @@
 				"type": "AzureBlobFS",
 				"annotations": [],
 				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+					"url": "@{linkedService().stor_url}"
 				},
 				"parameters": {
 					"stor_url": {
@@ -608,7 +550,7 @@
 				"type": "AzureBlobFS",
 				"annotations": [],
 				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage2KEY_properties_typeProperties_url')]",
+					"url": "@{linkedService().stor_url}",
 					"accountKey": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
@@ -718,7 +660,7 @@
 				"type": "AzureKeyVault",
 				"annotations": [],
 				"typeProperties": {
-					"baseUrl": "[parameters('AzureKeyVault_properties_typeProperties_baseUrl')]"
+					"baseUrl": "@{linkedService().akv_url}"
 				},
 				"parameters": {
 					"akv_url": {
@@ -729,53 +671,6 @@
 			"dependsOn": [
 				"[variables('factoryId')]"
 			]
-		},
-		{
-			"name": "[parameters('factoryName')]",
-			"type": "Microsoft.DataFactory/factories",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"globalParameters": {
-					"stor_url": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_stor_url_value')]"
-					},
-					"akv_url": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_akv_url_value')]"
-					},
-					"cluster_id": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_cluster_id_value')]"
-					},
-					"stor_name": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_stor_name_value')]"
-					},
-					"notebook_name": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_notebook_name_value')]"
-					},
-					"vaultBaseUrl": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_vaultBaseUrl_value')]"
-					},
-					"cosmosdb_name": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_cosmosdb_name_value')]"
-					},
-					"workspace_id_url": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_workspace_id_url_value')]"
-					},
-					"dbr_resource_id": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_dbr_resource_id_value')]"
-					}
-				}
-			},
-			"dependsOn": [],
-			"location": "[parameters('dataFactory_location')]"
 		}
 	]
 }

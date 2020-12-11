@@ -51,6 +51,10 @@
 			"type": "string",
 			"defaultValue": "https://westeurope.azuredatabricks.net/"
 		},
+		"dataFactory_properties_globalParameters_dbr_resource_id_value": {
+			"type": "string",
+			"defaultValue": "/subscriptions/513a7987-b0d9-4106-a24d-4b3f49136ea8/resourceGroups/blog-datapipelineprod-rg/providers/Microsoft.Databricks/workspaces/blog-datapipeline-dbrrb4"
+		},
 		"dataFactory_location": {
 			"type": "string",
 			"defaultValue": "westeurope"
@@ -105,6 +109,9 @@
 					},
 					"dataFactory_properties_globalParameters_workspace_id_url_value": {
 						"value": "[parameters('dataFactory_properties_globalParameters_workspace_id_url_value')]"
+					},
+					"dataFactory_properties_globalParameters_dbr_resource_id_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_dbr_resource_id_value')]"
 					},
 					"dataFactory_location": {
 						"value": "[parameters('dataFactory_location')]"

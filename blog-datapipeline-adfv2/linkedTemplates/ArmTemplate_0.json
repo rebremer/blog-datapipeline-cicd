@@ -39,6 +39,10 @@
 			"type": "string",
 			"defaultValue": "https://westeurope.azuredatabricks.net/"
 		},
+		"dataFactory_properties_globalParameters_dbr_resource_id_value": {
+			"type": "string",
+			"defaultValue": "/subscriptions/513a7987-b0d9-4106-a24d-4b3f49136ea8/resourceGroups/blog-datapipelineprod-rg/providers/Microsoft.Databricks/workspaces/blog-datapipeline-dbrrb4"
+		},
 		"dataFactory_location": {
 			"type": "string",
 			"defaultValue": "westeurope"
@@ -97,6 +101,10 @@
 					"workspace_id_url": {
 						"type": "string",
 						"value": "[parameters('dataFactory_properties_globalParameters_workspace_id_url_value')]"
+					},
+					"dbr_resource_id": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_dbr_resource_id_value')]"
 					}
 				}
 			},
@@ -117,6 +125,33 @@
 					"stor_url": {
 						"type": "String"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks_mi')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"workspace_id_url": {
+						"type": "String"
+					},
+					"cluster_id": {
+						"type": "String"
+					},
+					"dbr_resource_id": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "@{linkedService().workspace_id_url}",
+					"authentication": "MSI",
+					"workspaceResourceId": "@{linkedService().dbr_resource_id}",
+					"existingClusterId": "@{linkedService().cluster_id}"
 				}
 			},
 			"dependsOn": []
@@ -286,6 +321,128 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/blog-datapipeline-pipeline-dbrmi')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy csv to parquet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "rawdata//"
+							},
+							{
+								"name": "Destination",
+								"value": "defineddata//"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"skipLineCount": 0
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "csv_files_mi",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "parquet_files_mi",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Create graph and write CosmosDB",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy csv to parquet",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().globalParameters.notebook_name",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"cosmosdb_name": {
+									"value": "@pipeline().globalParameters.cosmosdb_name",
+									"type": "Expression"
+								},
+								"stor_name": {
+									"value": "@pipeline().globalParameters.stor_name",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks_mi",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"workspace_id_url": "@pipeline().globalParameters.workspace_id_url",
+								"cluster_id": "@pipeline().globalParameters.cluster_id",
+								"dbr_resource_id": "@pipeline().globalParameters.dbr_resource_id"
+							}
+						}
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2020-10-20T10:52:16Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/csv_files_mi')]",
+				"[concat(variables('factoryId'), '/datasets/parquet_files_mi')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks_mi')]"
 			]
 		},
 		{
