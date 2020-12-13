@@ -15,7 +15,7 @@ variables:
   VNET: 'blog-datapipeline-vnet'
   # global settings
   ACCESS_STOR_AADDBR: 0
-  SECRETSCOPE_KEYVAULT: 0
+  SECRETSCOPE_KEYVAULT: 0 # see script 4_configure_secret_scope_databricks.sh in key vault is used
   MOUNT_STORAGE_DATABRICKS: 0 # can only be used if access_store_AAD is true
   ENABLE_FIREWALL: 1
 
@@ -57,7 +57,7 @@ steps:
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     scriptType: bash
-    scriptPath: '../blog-datapipeline-cicd/scripts/2_configure_databricks.sh'
+    scriptPath: "../blog-datapipeline-cicd/scripts/2_configure_databricks.sh"
 - task: AzureCLI@1
   displayName: 'Configure access to storage account'
   inputs:
@@ -93,11 +93,11 @@ steps:
     location: $(LOC)
     csmFile: '../blog-datapipeline-deployadfv2/blog-datapipeline-adfv2/ARMTemplateForFactory.json'
     csmParametersFile: '../blog-datapipeline-deployadfv2/blog-datapipeline-adfv2/ARMTemplateParametersForFactory.json'
-    overrideParameters: "-factoryName $(ADFV2) -dataFactory_properties_globalParameters_akv_url_value $(akv_url) -dataFactory_properties_globalParameters_stor_url_value $(stor_url) -dataFactory_properties_globalParameters_stor_name_value $(STOR) -dataFactory_properties_globalParameters_cosmosdb_name_value $(COSMOSDBNAME) -dataFactory_properties_globalParameters_workspace_id_url_value $(workspace_id_url) -dataFactory_properties_globalParameters_cluster_id_value $(cluster_id) -dataFactory_properties_globalParameters_vaultBaseUrl_value $(akv_url) -dataFactory_location $(LOC) -dataFactory_properties_globalParameters_notebook_name_value /insert_data_CosmosDB_Gremlin.py"
+    overrideParameters: "-factoryName $(ADFV2) -dataFactory_properties_globalParameters_akv_url_value $(akv_url) -dataFactory_properties_globalParameters_stor_url_value $(stor_url) -dataFactory_properties_globalParameters_stor_name_value $(STOR) -dataFactory_properties_globalParameters_cosmosdb_name_value $(COSMOSDBNAME) -dataFactory_properties_globalParameters_dbr_resource_id_value $(dbr_resource_id) -dataFactory_properties_globalParameters_workspace_id_url_value $(workspace_id_url) -dataFactory_properties_globalParameters_cluster_id_value $(cluster_id) -dataFactory_properties_globalParameters_vaultBaseUrl_value $(akv_url) -dataFactory_location $(LOC) -dataFactory_properties_globalParameters_notebook_name_value /insert_data_CosmosDB_Gremlin.py"
 - task: AzurePowerShell@4
   displayName: 'Run ADFv2 pipeline - standard'
   inputs:
     azureSubscription: $(AzureServiceConnectionId)
     ScriptType: InlineScript
-    Inline: "Invoke-AzDataFactoryV2Pipeline -ResourceGroupName $(RG) -DataFactoryName $(ADFV2) -PipelineName \"blog-datapipeline-pipeline-mi\""
+    Inline: "Invoke-AzDataFactoryV2Pipeline -ResourceGroupName $(RG) -DataFactoryName $(ADFV2) -PipelineName \"blog-datapipeline-pipeline-dbrmi\""
     azurePowerShellVersion: LatestVersion

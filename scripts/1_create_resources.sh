@@ -12,8 +12,8 @@ az storage blob upload -f "../data/dboPerson.txt" -c "rawdata" -n "dboPerson.txt
 az storage blob upload -f "../data/dboRelation.txt" -c "rawdata" -n "dboRelation.txt" --account-name $STOR
 # Databricks
 az extension add --name databricks
-dbr_id=$(az databricks workspace show -g $RG -n $DBRWORKSPACE)
-if ["$dbr_id" = ""]; then
+dbr_response=$(az databricks workspace show -g $RG -n $DBRWORKSPACE)
+if ["$dbr_response" = ""]; then
    vnetaddressrange="10.210.0.0"
    subnet1addressrange="10.210.0.0"
    subnet2addressrange="10.210.1.0"
@@ -24,15 +24,18 @@ if ["$dbr_id" = ""]; then
    az network vnet subnet create -g $RG --vnet-name $VNET -n "private-subnet" --address-prefixes $subnet2addressrange/24 --network-security-group "private-subnet-nsg"
    az network vnet subnet update --resource-group $RG --name "public-subnet" --vnet-name $VNET --delegations Microsoft.Databricks/workspaces
    az network vnet subnet update --resource-group $RG --name "private-subnet" --vnet-name $VNET --delegations Microsoft.Databricks/workspaces
-   az databricks workspace create -l $LOC -n $DBRWORKSPACE -g $RG --sku premium --vnet $VNET --public-subnet "public-subnet" --private-subnet "private-subnet"
+   dbr_response=$(az databricks workspace create -l $LOC -n $DBRWORKSPACE -g $RG --sku premium --vnet $VNET --public-subnet "public-subnet" --private-subnet "private-subnet")
 fi
 # Variables
+dbr_resource_id=$(jq .id -r <<< "$dbr_response")
+workspaceUrl_no_http=$(jq .workspaceUrl -r <<< "$dbr_response")
+workspace_id_url="https://"$workspaceUrl_no_http"/"
 akv_url="https://"$AKV".vault.azure.net/"
 stor_url="https://"$STOR".dfs.core.windows.net/"
-workspace_id_url="https://"$LOC".azuredatabricks.net/"
+echo "##vso[task.setvariable variable=dbr_resource_id]$dbr_resource_id"
+echo "##vso[task.setvariable variable=workspace_id_url]$workspace_id_url"
 echo "##vso[task.setvariable variable=akv_url]$akv_url"
 echo "##vso[task.setvariable variable=stor_url]$stor_url"
-echo "##vso[task.setvariable variable=workspace_id_url]$workspace_id_url"
 # Cosmos DB graph API
 cosmosdbdatabase="peopledb"
 cosmosdbgraph="peoplegraph"
@@ -51,3 +54,6 @@ az keyvault set-policy -n $AKV --secret-permissions set get list --object-id $ad
 # Service connection SPN needs to have owner rights on account
 scope="/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Storage/storageAccounts/$STOR"
 az role assignment create --assignee-object-id $adfv2_id --role "Storage Blob Data Contributor" --scope $scope
+# Assign RBAC rights ADFv2 MI on Databricks 
+# Service connection SPN needs to have owner rights on account
+az role assignment create --assignee-object-id $adfv2_id --role "Contributor" --scope $dbr_resource_id
