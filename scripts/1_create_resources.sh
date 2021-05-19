@@ -47,7 +47,7 @@ cosmosdb_key=$(jq .primaryMasterKey -r <<< "$cosmosdb_response")
 az keyvault secret set -n cosmosdb-key --vault-name $AKV --value $cosmosdb_key
 # Datafactory
 az extension add --name datafactory
-api_response=$(az datafactory factory show -n $ADFV2 -g $RG)
+api_response=$(az datafactory show -n $ADFV2 -g $RG)
 adfv2_id=$(jq .identity.principalId -r <<< "$api_response")
 az keyvault set-policy -n $AKV --secret-permissions set get list --object-id $adfv2_id
 # Assign RBAC rights ADFv2 MI on storage account. 
