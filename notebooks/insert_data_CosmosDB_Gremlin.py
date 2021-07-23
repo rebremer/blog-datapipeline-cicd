@@ -114,18 +114,30 @@ display(cosmosDbEdges)
 
 # COMMAND ----------
 
-cosmosDbConfig = {
-  "Endpoint" : "https://" + par_cosmosdb_name + ".documents.azure.com:443/",
-  "Masterkey" : dbutils.secrets.get(scope="dbrkeys",key="cosmosdb-key"),
-  "Database" : "peopledb",
-  "Collection" : "peoplegraph",
-  "Upsert" : "true"
+cfg = {
+  "spark.cosmos.accountEndpoint" : "https://" + par_cosmosdb_name + ".documents.azure.com:443/",
+  "spark.cosmos.accountKey" : dbutils.secrets.get(scope="dbrkeys",key="cosmosdb-key"),
+  "spark.cosmos.database" : "peopledb",
+  "spark.cosmos.container" : "peoplegraph"
 }
 
-cosmosDbFormat = "com.microsoft.azure.cosmosdb.spark"
+cosmosDbFormat ="cosmos.oltp"
 
-cosmosDbVertices.write.format(cosmosDbFormat).mode("append").options(**cosmosDbConfig).save()
-cosmosDbEdges.write.format(cosmosDbFormat).mode("append").options(**cosmosDbConfig).save()
+cosmosDbVertices.write.format("cosmos.oltp").options(**cfg).mode("APPEND").save()
+cosmosDbEdges.write.format("cosmos.oltp").options(**cfg).mode("APPEND").save()
+
+#cosmosDbConfig = {
+#  "Endpoint" : "https://" + par_cosmosdb_name + ".documents.azure.com:443/",
+#  "Masterkey" : dbutils.secrets.get(scope="dbrkeys",key="cosmosdb-key"),
+#  "Database" : "peopledb",
+#  "Collection" : "peoplegraph",
+#  "Upsert" : "true"
+#}
+
+#cosmosDbFormat = "com.microsoft.azure.cosmosdb.spark"
+
+#cosmosDbVertices.write.format(cosmosDbFormat).mode("append").options(**cosmosDbConfig).save()
+#cosmosDbEdges.write.format(cosmosDbFormat).mode("append").options(**cosmosDbConfig).save()
 
 
 # COMMAND ----------
