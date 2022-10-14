@@ -33,12 +33,12 @@ api_response=$(curl -v -X POST ${workspace_id_url}api/2.0/dbfs/put \
   -H "Authorization: Bearer $token" \
   -H "X-Databricks-Azure-SP-Management-Token:$azToken" \
   -H "X-Databricks-Azure-Workspace-Resource-Id:$wsId" \
-  -F path="/azure-cosmosdb-spark_2.4.0_2.11-2.1.2-uber.jar" -F contents=@../libraries/azure-cosmos-spark_3-1_2-12-4.2.0.jar -F overwrite=true)
+  -F path="/azure-cosmos-spark_3-1_2-12-4.2.0.jar" -F contents=@../libraries/azure-cosmos-spark_3-1_2-12-4.2.0.jar -F overwrite=true)
 api_response=$(curl -v -X POST ${workspace_id_url}api/2.0/dbfs/put \
   -H "Authorization: Bearer $token" \
   -H "X-Databricks-Azure-SP-Management-Token:$azToken" \
   -H "X-Databricks-Azure-Workspace-Resource-Id:$wsId" \
-  -F path="/graphframes-0.8.1-spark2.4-s_2.11.jar" -F contents=@../libraries/graphframes-0.8.1-spark3.0-s_2.12.jar -F overwrite=true)
+  -F path="/graphframes-0.8.1-spark3.0-s_2.12.jar" -F contents=@../libraries/graphframes-0.8.1-spark3.0-s_2.12.jar -F overwrite=true)
 #
 # 4. Create Databricks cluster
 api_response=$(curl -v -X POST ${workspace_id_url}api/2.0/clusters/create \
