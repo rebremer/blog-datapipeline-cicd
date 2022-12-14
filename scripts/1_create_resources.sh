@@ -1,7 +1,7 @@
 # Resource group
 az group create -n $RG -l $LOC
 # Key vault
-az keyvault create -l $LOC -n $AKV -g $RG --enable-soft-delete false
+az keyvault create -l $LOC -n $AKV -g $RG
 tenantId=$(az account show --query tenantId -o tsv)
 az keyvault secret set -n tenant-id --vault-name $AKV --value $tenantId
 # Storage account
